@@ -56,10 +56,15 @@ export function RiskMap({
   return (
     <div className="relative w-full overflow-hidden rounded-2xl bg-card p-2 ring-1 ring-border">
       <div className="relative h-[min(58vh,520px)] min-h-[420px] w-full">
+        {cells.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+            Нет данных по выбранному показателю и типу рисков
+          </div>
+        )}
         {cells.map((cell, i) => {
           const r = rects[i]!;
-          const tone = cell.count === 0 ? "bg-muted text-muted-foreground" : toneFor(cell.sum, max);
-          const value = cell.count === 0 ? "—" : formatCompact(cell.sum);
+          const tone = toneFor(cell.sum, max);
+          const value = formatCompact(cell.sum);
           return (
             <button
               key={cell.id}
