@@ -10,7 +10,16 @@ export type RiskKindId =
   | "personnel"
   | "information"
   | "strategic"
-  | "ecological";
+  | "ecological"
+  | "market"
+  | "credit"
+  | "tax"
+  | "contractual"
+  | "project"
+  | "infrastructural"
+  | "social"
+  | "compliance"
+  | "sanctions";
 
 export const RISK_KINDS: { id: RiskKindId; name: string }[] = [
   { id: "reputational", name: "Репутационные" },
@@ -23,7 +32,17 @@ export const RISK_KINDS: { id: RiskKindId; name: string }[] = [
   { id: "information", name: "Информационные" },
   { id: "strategic", name: "Стратегические" },
   { id: "ecological", name: "Экологические" },
+  { id: "market", name: "Рыночные" },
+  { id: "credit", name: "Кредитные" },
+  { id: "tax", name: "Налоговые" },
+  { id: "contractual", name: "Договорные" },
+  { id: "project", name: "Проектные" },
+  { id: "infrastructural", name: "Инфраструктурные" },
+  { id: "social", name: "Социальные" },
+  { id: "compliance", name: "Комплаенс" },
+  { id: "sanctions", name: "Санкционные" },
 ];
+
 
 export type RiskLevel = "high" | "medium" | "low";
 
@@ -62,7 +81,7 @@ export const LEVEL_LABEL: Record<RiskLevel, string> = {
   low: "Низкий",
 };
 
-export const RISKS: Risk[] = [
+const BASE_RISKS: Risk[] = [
   {
     code: "TEST-RSK-1021",
     title: "Снижение качества услуг из-за расширения штата исполнителя",
@@ -262,6 +281,65 @@ export const RISKS: Risk[] = [
     source: "Реестр НПА",
   },
 ];
+
+/**
+ * Каждый вид риска должен быть представлен в каждом типе (активные / анализ / архив),
+ * чтобы на карте рисков не было пустых элементов и нулевых сумм.
+ */
+const STATUS_META: Record<RiskStatus, { stage: string; label: string }> = {
+  active: { stage: "В работе", label: "активный" },
+  analysis: { stage: "Оценка", label: "на анализе" },
+  archive: { stage: "Закрыт", label: "архивный" },
+};
+
+const FILLER_TITLES: Record<RiskKindId, string> = {
+  reputational: "Негативный медиафон вокруг бренда",
+  political: "Изменение отраслевого регулирования",
+  operational: "Сбой ключевого бизнес-процесса",
+  financial: "Рост стоимости заёмного финансирования",
+  legal: "Претензии контрагентов по договорам",
+  technological: "Отказ критичной ИТ-системы",
+  personnel: "Уход ключевых сотрудников",
+  information: "Компрометация внутренних данных",
+  strategic: "Отклонение от целевых показателей стратегии",
+  ecological: "Превышение нормативов воздействия на среду",
+  market: "Падение спроса на ключевом рынке",
+  credit: "Просрочка дебиторской задолженности",
+  tax: "Доначисления по итогам налоговой проверки",
+  contractual: "Неисполнение обязательств поставщиком",
+  project: "Срыв сроков инвестиционного проекта",
+  infrastructural: "Аварийность инженерной инфраструктуры",
+  social: "Социальная напряжённость в регионе присутствия",
+  compliance: "Нарушение внутренних политик и процедур",
+  sanctions: "Ограничения на расчёты и поставки",
+};
+
+const STRATEGIES = ["Снижение", "Принятие", "Передача", "Уклонение"];
+const SOURCES = ["АС Сенат", "Мониторинг", "Внутренний аудит", "Реестр НПА"];
+const LEVELS: RiskLevel[] = ["high", "medium", "low"];
+
+const FILLERS: Risk[] = RISK_KINDS.flatMap((kind, ki) =>
+  (Object.keys(STATUS_META) as RiskStatus[]).map((status, si) => {
+    const seed = ki * 3 + si;
+    const base = 250_000 + ((seed * 137) % 40) * 95_000;
+    return {
+      code: `TEST-RSK-${2000 + seed}`,
+      title: `${FILLER_TITLES[kind.id]} (${STATUS_META[status].label})`,
+      kind: kind.id,
+      status,
+      level: LEVELS[seed % LEVELS.length]!,
+      stage: STATUS_META[status].stage,
+      fact: base,
+      limit: Math.round(base * 1.8),
+      forecast: Math.round(base * 1.35),
+      strategy: STRATEGIES[seed % STRATEGIES.length]!,
+      source: SOURCES[seed % SOURCES.length]!,
+    } satisfies Risk;
+  }),
+);
+
+export const RISKS: Risk[] = [...BASE_RISKS, ...FILLERS];
+
 
 export function formatMoney(value: number) {
   return `${value.toLocaleString("ru-RU")} ₽`;

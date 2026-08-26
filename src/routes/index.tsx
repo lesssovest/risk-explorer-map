@@ -46,7 +46,7 @@ const NAV = [
 
 function RisksPage() {
   const [status, setStatus] = useState<RiskStatus>("active");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map">("map");
   const [metric, setMetric] = useState<MetricId>("fact");
   const [kindFilter, setKindFilter] = useState<RiskKindId | null>(null);
 
@@ -102,6 +102,17 @@ function RisksPage() {
 
         <div className="mt-5 flex flex-wrap items-center gap-2">
           <div className="flex flex-wrap items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
+            <button
+              onClick={() => setView(view === "map" ? "list" : "map")}
+              className={`pill ${
+                view === "map"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Карта рисков
+            </button>
+            <span className="px-1 text-muted-foreground">/</span>
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -115,18 +126,8 @@ function RisksPage() {
                 {tab.label}
               </button>
             ))}
-            <span className="px-1 text-muted-foreground">/</span>
-            <button
-              onClick={() => setView(view === "map" ? "list" : "map")}
-              className={`pill ${
-                view === "map"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Карта рисков
-            </button>
           </div>
+
         </div>
 
         {view === "map" && (
