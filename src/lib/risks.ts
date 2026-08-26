@@ -308,7 +308,7 @@ export function treemap(weights: number[], aspect = 1.9): Rect[] {
     const row: number[] = [];
     const rowItems: typeof items = [];
     while (idx < items.length) {
-      const next = items[idx];
+      const next = items[idx]!;
       if (row.length > 0 && worstRatio([...row, next.area], side) > worstRatio(row, side)) break;
       row.push(next.area);
       rowItems.push(next);

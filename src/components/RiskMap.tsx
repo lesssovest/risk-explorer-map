@@ -49,7 +49,7 @@ export function RiskMap({
     <div className="relative w-full overflow-hidden rounded-2xl bg-card p-2 ring-1 ring-border">
       <div className="relative h-[min(58vh,520px)] min-h-[420px] w-full">
         {cells.map((cell, i) => {
-          const r = rects[i];
+          const r = rects[i]!;
           const tone = TONES[i % TONES.length];
           const value = cell.count === 0 ? "—" : formatCompact(cell.sum);
           return (
