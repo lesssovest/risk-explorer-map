@@ -36,12 +36,12 @@ export function RiskMap({
   onSelectKind: (kind: RiskKindId) => void;
 }) {
   const cells: Cell[] = RISK_KINDS.map((kind) => {
-    const items = risks.filter((r) => r.kind === kind.id);
+    const items = risks.filter((r) => r.kind === kind.id && r[metric] !== null);
     return {
       id: kind.id,
       name: kind.name,
       count: items.length,
-      sum: items.reduce((acc, r) => acc + r[metric], 0),
+      sum: items.reduce((acc, r) => acc + (r[metric] ?? 0), 0),
     };
   });
 

@@ -36,7 +36,9 @@ export function RiskListCard({ risk }: { risk: Risk }) {
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Лимит</dt>
-          <dd className="mt-1 text-sm font-bold">{formatMoney(risk.limit)}</dd>
+          <dd className="mt-1 text-sm font-bold">
+            {risk.limit === null ? "—" : formatMoney(risk.limit)}
+          </dd>
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Прогноз</dt>

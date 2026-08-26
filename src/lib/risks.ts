@@ -55,7 +55,8 @@ export type Risk = {
   isNew?: boolean;
   stage: string;
   fact: number;
-  limit: number;
+  /** null — лимит по риску не установлен */
+  limit: number | null;
   forecast: number;
   strategy: string;
   source: string;
@@ -283,8 +284,9 @@ const BASE_RISKS: Risk[] = [
 ];
 
 /**
- * Каждый вид риска должен быть представлен в каждом типе (активные / анализ / архив),
- * чтобы на карте рисков не было пустых элементов и нулевых сумм.
+ * Синтетические риски для заполнения карты. Намеренно оставлены прорехи:
+ * у части видов нет лимитов, а в архиве и анализе отсутствуют некоторые виды,
+ * чтобы продемонстрировать прочерки и нули на карте.
  */
 const STATUS_META: Record<RiskStatus, { stage: string; label: string }> = {
   active: { stage: "В работе", label: "активный" },
@@ -318,10 +320,41 @@ const STRATEGIES = ["Снижение", "Принятие", "Передача", 
 const SOURCES = ["АС Сенат", "Мониторинг", "Внутренний аудит", "Реестр НПА"];
 const LEVELS: RiskLevel[] = ["high", "medium", "low"];
 
+// Виды, по которым в активных рисках лимиты не установлены — на карте по показателю
+// «Лимит» (активные) останется только 9 заполненных видов.
+const NO_LIMIT_ACTIVE: RiskKindId[] = [
+  "legal",
+  "personnel",
+  "strategic",
+  "ecological",
+  "credit",
+  "tax",
+  "project",
+  "social",
+  "compliance",
+  "sanctions",
+];
+
+// Виды, которых нет в архиве — на карте архива по ним будут прочерки.
+const ARCHIVE_GAPS: RiskKindId[] = [
+  "market",
+  "credit",
+  "tax",
+  "contractual",
+  "project",
+  "social",
+];
+
+// Виды, которых нет в статусе «Анализ рисков».
+const ANALYSIS_GAPS: RiskKindId[] = ["ecological", "market", "infrastructural"];
+
 const FILLERS: Risk[] = RISK_KINDS.flatMap((kind, ki) =>
-  (Object.keys(STATUS_META) as RiskStatus[]).map((status, si) => {
+  (Object.keys(STATUS_META) as RiskStatus[]).flatMap((status, si) => {
+    if (status === "archive" && ARCHIVE_GAPS.includes(kind.id)) return [];
+    if (status === "analysis" && ANALYSIS_GAPS.includes(kind.id)) return [];
     const seed = ki * 3 + si;
     const base = 250_000 + ((seed * 137) % 40) * 95_000;
+    const noLimit = status === "active" && NO_LIMIT_ACTIVE.includes(kind.id);
     return {
       code: `TEST-RSK-${2000 + seed}`,
       title: `${FILLER_TITLES[kind.id]} (${STATUS_META[status].label})`,
@@ -330,7 +363,7 @@ const FILLERS: Risk[] = RISK_KINDS.flatMap((kind, ki) =>
       level: LEVELS[seed % LEVELS.length]!,
       stage: STATUS_META[status].stage,
       fact: base,
-      limit: Math.round(base * 1.8),
+      limit: noLimit ? null : Math.round(base * 1.8),
       forecast: Math.round(base * 1.35),
       strategy: STRATEGIES[seed % STRATEGIES.length]!,
       source: SOURCES[seed % SOURCES.length]!,
