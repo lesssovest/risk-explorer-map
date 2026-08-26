@@ -325,7 +325,7 @@ const LEVELS: RiskLevel[] = ["high", "medium", "low"];
 const NO_LIMIT_ACTIVE: RiskKindId[] = [
   "legal",
   "personnel",
-  "information",
+  "strategic",
   "ecological",
   "credit",
   "tax",
