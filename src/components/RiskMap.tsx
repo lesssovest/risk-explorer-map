@@ -14,12 +14,17 @@ type Cell = {
   sum: number;
 };
 
-const TONES = [
-  "bg-high text-high-foreground",
-  "bg-info text-info-foreground",
-  "bg-violet text-violet-foreground",
-  "bg-warn text-warn-foreground",
-] as const;
+const TONE_HIGH = "bg-high text-high-foreground";
+const TONE_MID = "bg-warn text-warn-foreground";
+const TONE_LOW = "bg-ok text-ok-foreground";
+
+function toneFor(sum: number, max: number): string {
+  if (max <= 0) return TONE_LOW;
+  const ratio = sum / max;
+  if (ratio > 2 / 3) return TONE_HIGH;
+  if (ratio > 1 / 3) return TONE_MID;
+  return TONE_LOW;
+}
 
 export function RiskMap({
   risks,
@@ -50,7 +55,7 @@ export function RiskMap({
       <div className="relative h-[min(58vh,520px)] min-h-[420px] w-full">
         {cells.map((cell, i) => {
           const r = rects[i]!;
-          const tone = TONES[i % TONES.length];
+          const tone = cell.count === 0 ? "bg-muted text-muted-foreground" : toneFor(cell.sum, max);
           const value = cell.count === 0 ? "—" : formatCompact(cell.sum);
           return (
             <button
