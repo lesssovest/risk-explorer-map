@@ -278,66 +278,61 @@ export function formatCompact(value: number) {
 export type Rect = { x: number; y: number; w: number; h: number };
 
 export function treemap(weights: number[], aspect = 1.9): Rect[] {
+  const W = aspect;
+  const H = 1;
   const total = weights.reduce((a, b) => a + b, 0) || 1;
-  const items = weights.map((w, i) => ({ i, v: w / total }));
-  items.sort((a, b) => b.v - a.v);
-  const out: Rect[] = new Array(weights.length);
+  const items = weights
+    .map((w, i) => ({ i, area: (w / total) * W * H }))
+    .sort((a, b) => b.area - a.area);
 
-  let x = 0,
-    y = 0,
-    w = 1,
-    h = 1;
+  const out: Rect[] = new Array(weights.length);
+  let x = 0;
+  let y = 0;
+  let w = W;
+  let h = H;
   let idx = 0;
 
-  const layoutRow = (row: typeof items, rowSum: number, vertical: boolean) => {
-    let offset = 0;
-    for (const it of row) {
-      const share = rowSum > 0 ? it.v / rowSum : 1 / row.length;
-      if (vertical) {
-        const rw = (rowSum / h) * w * 0 + (rowSum * (w * h)) / (h * (w * h)) * w;
-        const width = rowSum / h;
-        out[it.i] = { x, y: y + offset * h, w: width, h: share * h };
-        void rw;
-        offset += share;
-      } else {
-        const height = rowSum / w;
-        out[it.i] = { x: x + offset * w, y, w: share * w, h: height };
-        offset += share;
-      }
-    }
-    if (vertical) {
-      const width = rowSum / h;
-      x += width;
-      w -= width;
-    } else {
-      const height = rowSum / w;
-      y += height;
-      h -= height;
-    }
-  };
-
-  const worst = (row: number[], length: number, sum: number) => {
-    const side = sum / length;
-    const max = Math.max(...row);
-    const min = Math.min(...row);
-    return Math.max((length * length * max) / (sum * sum), (sum * sum) / (length * length * min));
+  const worstRatio = (areas: number[], side: number) => {
+    const sum = areas.reduce((a, b) => a + b, 0);
+    if (sum <= 0 || side <= 0) return Infinity;
+    const max = Math.max(...areas);
+    const min = Math.min(...areas);
+    const s2 = sum * sum;
+    const side2 = side * side;
+    return Math.max((side2 * max) / s2, s2 / (side2 * min));
   };
 
   while (idx < items.length) {
-    const vertical = w * aspect >= h;
-    const length = vertical ? h : w;
-    const row: typeof items = [];
-    let sum = 0;
+    const vertical = w >= h;
+    const side = vertical ? h : w;
+    const row: number[] = [];
+    const rowItems: typeof items = [];
     while (idx < items.length) {
       const next = items[idx];
-      const candidate = [...row.map((r) => r.v), next.v];
-      if (row.length === 0 || worst(candidate, length, sum + next.v) <= worst(row.map((r) => r.v), length, sum)) {
-        row.push(next);
-        sum += next.v;
-        idx++;
-      } else break;
+      if (row.length > 0 && worstRatio([...row, next.area], side) > worstRatio(row, side)) break;
+      row.push(next.area);
+      rowItems.push(next);
+      idx++;
     }
-    layoutRow(row, sum, vertical);
+    const sum = row.reduce((a, b) => a + b, 0);
+    const thickness = side > 0 ? sum / side : 0;
+    let offset = 0;
+    for (const it of rowItems) {
+      const len = thickness > 0 ? it.area / thickness : side / rowItems.length;
+      if (vertical) {
+        out[it.i] = { x: x / W, y: (y + offset) / H, w: thickness / W, h: len / H };
+      } else {
+        out[it.i] = { x: (x + offset) / W, y: y / H, w: len / W, h: thickness / H };
+      }
+      offset += len;
+    }
+    if (vertical) {
+      x += thickness;
+      w -= thickness;
+    } else {
+      y += thickness;
+      h -= thickness;
+    }
   }
 
   return out;
