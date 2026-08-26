@@ -46,7 +46,7 @@ const NAV = [
 
 function RisksPage() {
   const [status, setStatus] = useState<RiskStatus>("active");
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map">("map");
   const [metric, setMetric] = useState<MetricId>("fact");
   const [kindFilter, setKindFilter] = useState<RiskKindId | null>(null);
 
