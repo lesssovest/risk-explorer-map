@@ -100,7 +100,7 @@ function RisksPage() {
           </button>
         </header>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
             <button
               onClick={() => setView(view === "map" ? "list" : "map")}
@@ -128,6 +128,19 @@ function RisksPage() {
             ))}
           </div>
 
+          <button
+            onClick={() => setKindFilter(null)}
+            title={kindName ? `Вид риска: ${kindName} — нажмите, чтобы сбросить` : "Фильтры не применены"}
+            className="pill text-muted-foreground hover:text-foreground"
+          >
+            Фильтр
+            {kindFilter && (
+              <span
+                aria-label="Фильтр применён"
+                className="h-2 w-2 rounded-full bg-destructive"
+              />
+            )}
+          </button>
         </div>
 
         {view === "map" && (
@@ -151,21 +164,6 @@ function RisksPage() {
           </div>
         )}
 
-        {kindFilter && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-sm text-muted-foreground">Фильтры:</span>
-            <span className="pill bg-card ring-1 ring-border">
-              Вид риска: {kindName}
-              <button
-                onClick={() => setKindFilter(null)}
-                aria-label="Сбросить фильтр по виду риска"
-                className="ml-1 text-muted-foreground hover:text-foreground"
-              >
-                ✕
-              </button>
-            </span>
-          </div>
-        )}
 
         <div className="mt-5">
           {view === "map" ? (
