@@ -40,6 +40,8 @@
   --color-violet-foreground: var(--violet-foreground);
   --color-warn: var(--warn);
   --color-warn-foreground: var(--warn-foreground);
+  --color-ok: var(--ok);
+  --color-ok-foreground: var(--ok-foreground);
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -73,6 +75,8 @@
   --violet-foreground: oklch(0.52 0.18 300);
   --warn: oklch(0.95 0.05 85);
   --warn-foreground: oklch(0.58 0.13 70);
+  --ok: oklch(0.94 0.045 160);
+  --ok-foreground: oklch(0.5 0.13 160);
 }
 
 @layer base {
