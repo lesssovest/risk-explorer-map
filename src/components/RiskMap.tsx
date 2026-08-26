@@ -35,7 +35,7 @@ export function RiskMap({
   metric: MetricId;
   onSelectKind: (kind: RiskKindId) => void;
 }) {
-  const cells: Cell[] = RISK_KINDS.map((kind) => {
+  const allCells: Cell[] = RISK_KINDS.map((kind) => {
     const items = risks.filter((r) => r.kind === kind.id && r[metric] !== null);
     return {
       id: kind.id,
@@ -45,18 +45,26 @@ export function RiskMap({
     };
   });
 
+  // Виды рисков без данных (нет ни одного риска с установленным показателем)
+  // на карте не отображаются — вместо прочерка просто скрываем их.
+  const cells = allCells.filter((c) => c.count > 0);
+
   const max = Math.max(...cells.map((c) => c.sum), 1);
-  // Minimum weight keeps empty / zero-sum kinds visible and readable.
   const weights = cells.map((c) => 0.35 + (c.sum / max) * 1.65);
   const rects = treemap(weights, 2.1);
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl bg-card p-2 ring-1 ring-border">
       <div className="relative h-[min(58vh,520px)] min-h-[420px] w-full">
+        {cells.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+            Нет данных по выбранному показателю и типу рисков
+          </div>
+        )}
         {cells.map((cell, i) => {
           const r = rects[i]!;
-          const tone = cell.count === 0 ? "bg-muted text-muted-foreground" : toneFor(cell.sum, max);
-          const value = cell.count === 0 ? "—" : formatCompact(cell.sum);
+          const tone = toneFor(cell.sum, max);
+          const value = formatCompact(cell.sum);
           return (
             <button
               key={cell.id}
