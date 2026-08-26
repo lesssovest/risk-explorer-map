@@ -10,7 +10,16 @@ export type RiskKindId =
   | "personnel"
   | "information"
   | "strategic"
-  | "ecological";
+  | "ecological"
+  | "market"
+  | "credit"
+  | "tax"
+  | "contractual"
+  | "project"
+  | "infrastructural"
+  | "social"
+  | "compliance"
+  | "sanctions";
 
 export const RISK_KINDS: { id: RiskKindId; name: string }[] = [
   { id: "reputational", name: "Репутационные" },
@@ -23,7 +32,17 @@ export const RISK_KINDS: { id: RiskKindId; name: string }[] = [
   { id: "information", name: "Информационные" },
   { id: "strategic", name: "Стратегические" },
   { id: "ecological", name: "Экологические" },
+  { id: "market", name: "Рыночные" },
+  { id: "credit", name: "Кредитные" },
+  { id: "tax", name: "Налоговые" },
+  { id: "contractual", name: "Договорные" },
+  { id: "project", name: "Проектные" },
+  { id: "infrastructural", name: "Инфраструктурные" },
+  { id: "social", name: "Социальные" },
+  { id: "compliance", name: "Комплаенс" },
+  { id: "sanctions", name: "Санкционные" },
 ];
+
 
 export type RiskLevel = "high" | "medium" | "low";
 
