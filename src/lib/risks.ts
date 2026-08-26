@@ -81,7 +81,7 @@ export const LEVEL_LABEL: Record<RiskLevel, string> = {
   low: "Низкий",
 };
 
-export const RISKS: Risk[] = [
+const BASE_RISKS: Risk[] = [
   {
     code: "TEST-RSK-1021",
     title: "Снижение качества услуг из-за расширения штата исполнителя",
