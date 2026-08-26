@@ -35,7 +35,7 @@ export function RiskMap({
   metric: MetricId;
   onSelectKind: (kind: RiskKindId) => void;
 }) {
-  const cells: Cell[] = RISK_KINDS.map((kind) => {
+  const allCells: Cell[] = RISK_KINDS.map((kind) => {
     const items = risks.filter((r) => r.kind === kind.id && r[metric] !== null);
     return {
       id: kind.id,
@@ -45,8 +45,11 @@ export function RiskMap({
     };
   });
 
+  // Виды рисков без данных (нет ни одного риска с установленным показателем)
+  // на карте не отображаются — вместо прочерка просто скрываем их.
+  const cells = allCells.filter((c) => c.count > 0);
+
   const max = Math.max(...cells.map((c) => c.sum), 1);
-  // Minimum weight keeps empty / zero-sum kinds visible and readable.
   const weights = cells.map((c) => 0.35 + (c.sum / max) * 1.65);
   const rects = treemap(weights, 2.1);
 
