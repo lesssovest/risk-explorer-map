@@ -52,8 +52,10 @@ export function RiskMap({
   // на карте не отображаются — вместо прочерка просто скрываем их.
   const cells = allCells.filter((c) => c.hasData);
 
+  // Минимальный вес повышен, чтобы даже у самых маленьких сумм
+  // плитка была достаточно большой для полного названия вида риска.
   const max = Math.max(...cells.map((c) => c.sum), 1);
-  const weights = cells.map((c) => 0.35 + (c.sum / max) * 1.65);
+  const weights = cells.map((c) => 0.6 + (c.sum / max) * 1.4);
   const rects = treemap(weights, 2.1);
 
   return (
