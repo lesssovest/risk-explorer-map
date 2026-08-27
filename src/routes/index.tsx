@@ -145,7 +145,7 @@ function RisksPage() {
 
         {view === "map" && (
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="text-sm text-muted-foreground">Показатель:</span>
+            <span className="text-sm text-muted-foreground">Потери:</span>
             <div className="flex items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
               {METRICS.map((m) => (
                 <button
