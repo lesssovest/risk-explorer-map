@@ -58,12 +58,14 @@ export type Risk = {
   /** null — лимит по риску не установлен */
   limit: number | null;
   forecast: number;
+  potential: number;
   strategy: string;
   source: string;
 };
 
 export const METRICS = [
-  { id: "fact", label: "Факт потерь" },
+  { id: "potential", label: "Потенциальные" },
+  { id: "fact", label: "Фактические" },
   { id: "limit", label: "Лимит" },
   { id: "forecast", label: "Прогноз" },
 ] as const;
@@ -82,7 +84,7 @@ export const LEVEL_LABEL: Record<RiskLevel, string> = {
   low: "Низкий",
 };
 
-const BASE_RISKS: Risk[] = [
+const BASE_RISKS: Omit<Risk, "potential">[] = [
   {
     code: "TEST-RSK-1021",
     title: "Снижение качества услуг из-за расширения штата исполнителя",
@@ -348,7 +350,7 @@ const ARCHIVE_GAPS: RiskKindId[] = [
 // Виды, которых нет в статусе «Анализ рисков».
 const ANALYSIS_GAPS: RiskKindId[] = ["ecological", "market", "infrastructural"];
 
-const FILLERS: Risk[] = RISK_KINDS.flatMap((kind, ki) =>
+const FILLERS: Omit<Risk, "potential">[] = RISK_KINDS.flatMap((kind, ki) =>
   (Object.keys(STATUS_META) as RiskStatus[]).flatMap((status, si) => {
     if (status === "archive" && ARCHIVE_GAPS.includes(kind.id)) return [];
     if (status === "analysis" && ANALYSIS_GAPS.includes(kind.id)) return [];
@@ -367,11 +369,14 @@ const FILLERS: Risk[] = RISK_KINDS.flatMap((kind, ki) =>
       forecast: Math.round(base * 1.35),
       strategy: STRATEGIES[seed % STRATEGIES.length]!,
       source: SOURCES[seed % SOURCES.length]!,
-    } satisfies Risk;
+    } satisfies Omit<Risk, "potential">;
   }),
 );
 
-export const RISKS: Risk[] = [...BASE_RISKS, ...FILLERS];
+export const RISKS: Risk[] = [...BASE_RISKS, ...FILLERS].map((r) => ({
+  ...r,
+  potential: Math.round((r.forecast || r.fact || 250_000) * 1.8),
+}));
 
 
 export function formatMoney(value: number) {
