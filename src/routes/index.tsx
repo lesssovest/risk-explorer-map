@@ -89,12 +89,27 @@ function RisksPage() {
 
       <main className="min-w-0 flex-1 px-4 py-6 md:px-8">
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-black tracking-tight md:text-3xl">
-            — Все риски{" "}
-            <sup className="align-super text-sm font-bold text-muted-foreground">
-              {byStatus.length}
-            </sup>
-          </h1>
+          {view === "list" && kindFilter ? (
+            <button
+              onClick={() => {
+                setKindFilter(null);
+                setView("map");
+              }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <span aria-hidden className="text-base leading-none">
+                ←
+              </span>
+              Вернуться в карту рисков
+            </button>
+          ) : (
+            <h1 className="text-2xl font-black tracking-tight md:text-3xl">
+              — Все риски{" "}
+              <sup className="align-super text-sm font-bold text-muted-foreground">
+                {byStatus.length}
+              </sup>
+            </h1>
+          )}
           <button className="pill bg-card text-violet-foreground ring-1 ring-violet-foreground/30">
             ✦ Выявить новые риски
           </button>
