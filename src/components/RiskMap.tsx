@@ -60,7 +60,7 @@ export function RiskMap({
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl bg-card p-2 ring-1 ring-border">
-      <div className="relative h-[min(58vh,520px)] min-h-[420px] w-full">
+      <div className="relative h-[min(64vh,600px)] min-h-[480px] w-full">
         {cells.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
             Нет данных по выбранному показателю и типу рисков
@@ -86,7 +86,7 @@ export function RiskMap({
                 className={`flex h-full w-full flex-col justify-between overflow-hidden rounded-xl px-3 py-2.5 ring-1 ring-inset ring-border/60 transition-transform duration-150 hover:-translate-y-0.5 hover:ring-primary ${tone}`}
               >
                 <span className="flex items-start justify-between gap-2">
-                  <span className="truncate text-[0.8125rem] font-semibold leading-tight">
+                  <span className="break-words text-[0.8125rem] font-semibold leading-snug">
                     {cell.name}
                   </span>
                   <span className="shrink-0 text-[0.6875rem] font-semibold tabular-nums opacity-55">
