@@ -70,12 +70,15 @@ export function RiskMap({
           const r = rects[i]!;
           const tone = toneFor(cell.sum, max);
           const value = formatCompact(cell.sum);
+          // Зеркальное отражение по горизонтали: вид с наибольшей суммой —
+          // в правом верхнем углу, с наименьшей — в левом нижнем.
+          const left = (1 - r.x - r.w) * 100;
           return (
             <button
               key={cell.id}
               onClick={() => onSelectKind(cell.id)}
               style={{
-                left: `${r.x * 100}%`,
+                left: `${left}%`,
                 top: `${r.y * 100}%`,
                 width: `${r.w * 100}%`,
                 height: `${r.h * 100}%`,
