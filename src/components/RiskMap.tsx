@@ -49,16 +49,18 @@ export function RiskMap({
 
   // Виды рисков без данных (нет ни одного риска с установленным показателем)
   // на карте не отображаются — вместо прочерка просто скрываем их.
-  const cells = allCells.filter((c) => c.hasData);
+  // Сортируем по убыванию суммы: вместе с row-reverse + wrap
+  // наибольшая сумма оказывается справа сверху, наименьшая — слева снизу.
+  const cells = allCells.filter((c) => c.hasData).sort((a, b) => b.sum - a.sum);
   const max = Math.max(...cells.map((c) => c.sum), 1);
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl bg-card p-2 ring-1 ring-border">
       {/* Flex-раскладка: плитки переносятся на новые строки при изменении
           масштаба/ширины и никогда не налезают друг на друга.
-          row-reverse + wrap-reverse: наибольшая сумма — справа сверху,
-          наименьшая — слева снизу. */}
-      <div className="flex h-[min(64vh,600px)] min-h-[480px] w-full flex-row-reverse flex-wrap-reverse content-stretch gap-1 overflow-y-auto">
+          row-reverse (первая плитка — справа): наибольшая сумма — справа
+          сверху, наименьшая — слева снизу. */}
+      <div className="flex h-[min(64vh,600px)] min-h-[480px] w-full flex-row-reverse flex-wrap content-stretch gap-1 overflow-y-auto">
         {cells.length === 0 && (
           <div className="flex w-full items-center justify-center text-sm text-muted-foreground">
             Нет данных по выбранному показателю и типу рисков
