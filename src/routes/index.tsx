@@ -49,6 +49,27 @@ function RisksPage() {
   const [view, setView] = useState<"list" | "map">("map");
   const [metric, setMetric] = useState<MetricId>("fact");
   const [kindFilter, setKindFilter] = useState<RiskKindId | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadMap = async () => {
+    if (!mapRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const { toJpeg } = await import("html-to-image");
+      const dataUrl = await toJpeg(mapRef.current, {
+        quality: 0.95,
+        pixelRatio: 2,
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
+      });
+      const link = document.createElement("a");
+      link.download = `karta-riskov-${metric}.jpg`;
+      link.href = dataUrl;
+      link.click();
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const byStatus = useMemo(() => RISKS.filter((r) => r.status === status), [status]);
   const listRisks = useMemo(
