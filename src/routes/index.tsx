@@ -176,14 +176,16 @@ function RisksPage() {
 
         <div className="mt-5">
           {view === "map" ? (
-            <RiskMap
-              risks={byStatus}
-              metric={metric}
-              onSelectKind={(kind) => {
-                setKindFilter(kind);
-                setView("list");
-              }}
-            />
+            <div ref={mapRef}>
+              <RiskMap
+                risks={byStatus}
+                metric={metric}
+                onSelectKind={(kind) => {
+                  setKindFilter(kind);
+                  setView("list");
+                }}
+              />
+            </div>
           ) : (
             <div className="flex flex-col gap-4">
               {listRisks.length === 0 ? (
