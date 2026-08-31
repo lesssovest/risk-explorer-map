@@ -110,7 +110,7 @@ export function RiskMap({
               // flex-row-reverse: крупнейший элемент ряда — справа,
               // ряды идут по убыванию, значит максимум — в правом верхнем
               // углу, минимум — в левом нижнем.
-              <div key={ri} className="flex w-full flex-row-reverse gap-1.5">
+              <div key={ri} className="flex w-full flex-row-reverse items-start gap-1.5">
                 {row.cells.map((cell, ci) => {
                   const tone = toneFor(cell.sum, max);
                   const value = formatCompact(cell.sum);
