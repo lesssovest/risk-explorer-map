@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { RiskListCard } from "@/components/RiskListCard";
 import { RiskMap } from "@/components/RiskMap";
 import {
