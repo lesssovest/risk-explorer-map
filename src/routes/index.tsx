@@ -124,7 +124,7 @@ function RisksPage() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
             <button
-              onClick={() => setView(view === "map" ? "list" : "map")}
+              onClick={() => setView("map")}
               className={`pill ${
                 view === "map"
                   ? "bg-primary text-primary-foreground"
@@ -137,9 +137,12 @@ function RisksPage() {
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setStatus(tab.id)}
+                onClick={() => {
+                  setStatus(tab.id);
+                  setView("list");
+                }}
                 className={`pill ${
-                  status === tab.id
+                  status === tab.id && view === "list"
                     ? "bg-card text-foreground ring-1 ring-border"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
