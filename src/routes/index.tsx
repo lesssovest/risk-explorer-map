@@ -57,11 +57,23 @@ function RisksPage() {
     setDownloading(true);
     try {
       const { toJpeg } = await import("html-to-image");
+      const metricLabel =
+        METRICS.find((m) => m.id === metric)?.label ?? metric;
+      const statusLabel =
+        STATUS_TABS.find((t) => t.id === status)?.label ?? "Активные риски";
+      // Временная плашка-заголовок с выбранным показателем и типом рисков,
+      // видна только на скачанной картинке.
+      const caption = document.createElement("div");
+      caption.style.cssText =
+        "display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;font-family:inherit;font-weight:700;font-size:18px;color:var(--foreground);background:var(--card);border-bottom:1px solid var(--border);";
+      caption.innerHTML = `<span style="font-size:20px;font-weight:900;">Карта рисков</span><span style="font-size:15px;font-weight:600;color:var(--muted-foreground);">${statusLabel} · Потери: ${metricLabel}</span>`;
+      mapRef.current.prepend(caption);
       const dataUrl = await toJpeg(mapRef.current, {
         quality: 0.95,
         pixelRatio: 2,
         backgroundColor: getComputedStyle(document.body).backgroundColor,
       });
+      caption.remove();
       const link = document.createElement("a");
       link.download = `karta-riskov-${metric}.jpg`;
       link.href = dataUrl;
