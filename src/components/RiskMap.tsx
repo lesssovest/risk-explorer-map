@@ -1,4 +1,5 @@
 import {
+  METRICS,
   RISK_KINDS,
   formatCompact,
   treemap,
@@ -6,6 +7,7 @@ import {
   type Risk,
   type RiskKindId,
 } from "@/lib/risks";
+import type { RefObject } from "react";
 
 type Cell = {
   id: RiskKindId;
@@ -30,11 +32,19 @@ function toneFor(sum: number, max: number): string {
 export function RiskMap({
   risks,
   metric,
+  onMetricChange,
   onSelectKind,
+  gridRef,
+  onDownload,
+  downloading,
 }: {
   risks: Risk[];
   metric: MetricId;
+  onMetricChange: (m: MetricId) => void;
   onSelectKind: (kind: RiskKindId) => void;
+  gridRef: RefObject<HTMLDivElement | null>;
+  onDownload: () => void;
+  downloading: boolean;
 }) {
   const allCells: Cell[] = RISK_KINDS.map((kind) => {
     const items = risks.filter((r) => r.kind === kind.id && r[metric] !== null);
@@ -59,50 +69,81 @@ export function RiskMap({
   const rects = treemap(weights, 2.1);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl bg-card p-2 ring-1 ring-border">
-      <div className="relative h-[min(64vh,600px)] min-h-[480px] w-full">
-        {cells.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-            Нет данных по выбранному показателю и типу рисков
-          </div>
-        )}
-        {cells.map((cell, i) => {
-          const r = rects[i]!;
-          const tone = toneFor(cell.sum, max);
-          const value = formatCompact(cell.sum);
-          // Зеркальное отражение по горизонтали: вид с наибольшей суммой —
-          // в правом верхнем углу, с наименьшей — в левом нижнем.
-          const left = (1 - r.x - r.w) * 100;
-          return (
-            <button
-              key={cell.id}
-              onClick={() => onSelectKind(cell.id)}
-              style={{
-                left: `${left}%`,
-                top: `${r.y * 100}%`,
-                width: `${r.w * 100}%`,
-                height: `${r.h * 100}%`,
-              }}
-              className="absolute p-1 text-left"
-            >
-              <span
-                className={`flex h-full w-full flex-col justify-between overflow-hidden rounded-xl px-3 py-2.5 ring-1 ring-inset ring-border/60 transition-transform duration-150 hover:-translate-y-0.5 hover:ring-primary ${tone}`}
+    <div className="relative w-full overflow-hidden rounded-2xl bg-card ring-1 ring-border">
+      {/* Шапка карты: переключатель показателя потерь + скачивание */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm text-muted-foreground">Потери:</span>
+          <div className="flex items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
+            {METRICS.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => onMetricChange(m.id)}
+                className={`pill ${
+                  metric === m.id
+                    ? "bg-card text-foreground ring-1 ring-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                <span className="flex items-start justify-between gap-2">
-                  <span className="break-words text-[0.8125rem] font-semibold leading-snug">
-                    {cell.name}
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button
+          onClick={onDownload}
+          disabled={downloading}
+          className="pill bg-surface text-muted-foreground ring-1 ring-border hover:text-foreground disabled:opacity-50"
+        >
+          ⤓ {downloading ? "Скачивание…" : "Скачать карту"}
+        </button>
+      </div>
+
+      <div className="p-2">
+        <div ref={gridRef} className="relative h-[min(64vh,600px)] min-h-[480px] w-full">
+          {cells.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
+              Нет данных по выбранному показателю и типу рисков
+            </div>
+          )}
+          {cells.map((cell, i) => {
+            const r = rects[i]!;
+            const tone = toneFor(cell.sum, max);
+            const value = formatCompact(cell.sum);
+            // Зеркальное отражение по горизонтали: вид с наибольшей суммой —
+            // в правом верхнем углу, с наименьшей — в левом нижнем.
+            const left = (1 - r.x - r.w) * 100;
+            return (
+              <button
+                key={cell.id}
+                onClick={() => onSelectKind(cell.id)}
+                style={{
+                  left: `${left}%`,
+                  top: `${r.y * 100}%`,
+                  width: `${r.w * 100}%`,
+                  height: `${r.h * 100}%`,
+                }}
+                className="absolute p-1 text-left"
+              >
+                <span
+                  className={`flex h-full w-full flex-col justify-between overflow-hidden rounded-xl px-3 py-2.5 ring-1 ring-inset ring-border/60 transition-transform duration-150 hover:-translate-y-0.5 hover:ring-primary ${tone}`}
+                >
+                  <span className="flex items-start justify-between gap-2">
+                    <span className="break-words text-[0.8125rem] font-semibold leading-snug">
+                      {cell.name}
+                    </span>
+                    <span className="shrink-0 text-[0.6875rem] font-semibold tabular-nums opacity-55">
+                      {cell.count}
+                    </span>
                   </span>
-                  <span className="shrink-0 text-[0.6875rem] font-semibold tabular-nums opacity-55">
-                    {cell.count}
+                  <span className="truncate text-base font-bold leading-tight sm:text-lg">
+                    {value}
                   </span>
                 </span>
-                <span className="truncate text-base font-bold leading-tight sm:text-lg">
-                  {value}
-                </span>
-              </span>
-            </button>
-          );
-        })}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
