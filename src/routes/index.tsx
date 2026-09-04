@@ -152,19 +152,21 @@ function RisksPage() {
             ))}
           </div>
 
-          <button
-            onClick={() => setKindFilter(null)}
-            title={kindName ? `Вид риска: ${kindName} — нажмите, чтобы сбросить` : "Фильтры не применены"}
-            className="pill text-muted-foreground hover:text-foreground"
-          >
-            Фильтр
-            {kindFilter && (
-              <span
-                aria-label="Фильтр применён"
-                className="h-2 w-2 rounded-full bg-destructive"
-              />
-            )}
-          </button>
+          {view === "list" && (
+            <button
+              onClick={() => setKindFilter(null)}
+              title={kindName ? `Вид риска: ${kindName} — нажмите, чтобы сбросить` : "Фильтры не применены"}
+              className="pill text-muted-foreground hover:text-foreground"
+            >
+              Фильтр
+              {kindFilter && (
+                <span
+                  aria-label="Фильтр применён"
+                  className="h-2 w-2 rounded-full bg-destructive"
+                />
+              )}
+            </button>
+          )}
         </div>
 
         {view === "map" && (
