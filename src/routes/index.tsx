@@ -169,20 +169,49 @@ function RisksPage() {
           )}
         </div>
 
+        {view === "map" && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-muted-foreground">Потери:</span>
+              <div className="flex items-center gap-1 rounded-full bg-surface p-1 ring-1 ring-border">
+                {METRICS.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setMetric(m.id)}
+                    className={`pill ${
+                      metric === m.id
+                        ? "bg-card text-foreground ring-1 ring-border"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={downloadMap}
+              disabled={downloading}
+              className="pill bg-card text-muted-foreground ring-1 ring-border hover:text-foreground disabled:opacity-50"
+            >
+              ⤓ {downloading ? "Скачивание…" : "Скачать карту"}
+            </button>
+          </div>
+        )}
+
+
         <div className="mt-5">
           {view === "map" ? (
-            <RiskMap
-              risks={byStatus}
-              metric={metric}
-              onMetricChange={setMetric}
-              onSelectKind={(kind) => {
-                setKindFilter(kind);
-                setView("list");
-              }}
-              gridRef={mapRef}
-              onDownload={downloadMap}
-              downloading={downloading}
-            />
+            <div ref={mapRef}>
+              <RiskMap
+                risks={byStatus}
+                metric={metric}
+                onSelectKind={(kind) => {
+                  setKindFilter(kind);
+                  setView("list");
+                }}
+              />
+            </div>
           ) : (
             <div className="flex flex-col gap-4">
               {listRisks.length === 0 ? (
